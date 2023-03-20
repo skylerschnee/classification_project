@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[353]:
+# In[445]:
 
 
 import matplotlib.pyplot as plt
@@ -46,7 +46,7 @@ def get_pie_sen_churn(train):
     ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
             shadow=True, startangle=90, colors=['lightblue', 'yellow'])
     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    plt.title('Seniors are Over 25% of the Churned Customer Population')
+    plt.title('Seniors are Roughly 25% of the Churned Customer Population')
     plt.show()
     
 def get_pie_sen_compared(train):
@@ -83,7 +83,7 @@ def get_pie_sen_compared(train):
     ax2.pie(sizes2, explode=explode2, labels=labels2, autopct='%1.1f%%',
         shadow=True, startangle=90, colors=['lightblue', 'yellow'])
     ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    ax2.title.set_text('Seniors are Over 25% of the Churned Customer Population')
+    ax2.title.set_text('Seniors are roughly 25% of the Churned Customer Population')
 
 
     # display and format plot for a clean fit
@@ -102,43 +102,47 @@ def get_chi_senior(train):
 
     print(f'chi2 = {chi2:.4f}')
     print(f'p     = {p:.8f}')    
-        
+    
 def get_bar_charges(train):
     '''
-    return a bar chart visualizing the discrepancy in monthly
-    charges between seniors and non seniors
+    return a bar chart visualizing the amount of churned customers paying 
+    more or less than the population avg monthly charges as well as those 
+    in the same categories who have not churned
     '''
     
-    # quantify avg monthly charges for seniors an non-seniors
-    sen_avg_charges = train.monthly_charges[(train['senior_citizen'] == 1)].mean()
-    non_sen_avg_charges = train.monthly_charges[(train['senior_citizen'] == 0)].mean()
+    # defined groups
+    avg_mon_charges = train.monthly_charges.mean()
+    tot_more_than_avg = len(train[(train['monthly_charges'] > avg_mon_charges)])
+    churned_pay_more = len(train[(train['churn'] == 'Yes') & (train['monthly_charges'] > avg_mon_charges)])
+    tot_less_than_avg = len(train[(train['monthly_charges'] < avg_mon_charges)])
+    churned_pay_less = len(train[(train['churn'] == 'Yes') & (train['monthly_charges'] < avg_mon_charges)])
     
     # establish variables
-    courses = ['Senior Avg Monthly Charges','Non - Senior Avg Monthly Charges']
-    values = [sen_avg_charges, non_sen_avg_charges]
-
-    fig = plt.figure(figsize = (5, 6))
+    groups = ['Pays More Than Average', 'Pays More Than Average(Churned)', 'Pays Less Than Average', 'Pays Less Than Average(Churned)']
+    values = [tot_more_than_avg, churned_pay_more, tot_less_than_avg, churned_pay_less]
+    colors_list = ['lightgreen', 'red', 'lightgreen', 'red']
+    
+    fig = plt.figure(figsize = (12, 6))
 
     # creating the bar plot
-    plt.bar(courses, values, color ='orange',
-            width = .5, edgecolor = 'black')
+    plt.bar(groups, values, color =colors_list, width = .5, edgecolor = 'black')
 
     # label and show
-    plt.ylabel("Mean of Monthly Charges ($)")
-    plt.title("Senior Citizens Pay 29% More Than Non-Seniors Monthly")
+    plt.ylabel("Number of Customers")
+    plt.title("Monthly Charges")
     plt.show()
     
-def sen_churn_tstat(train): 
+def charges_churn_tstat(train): 
     '''
-    sen_churn_tstat wil return the tstat and p-value of and independent t-test
-    comapring the monthlt charges of churned seniors with non-churned seniors
+    charges_churn_tstat wil return the tstat and p-value of and independent t-test
+    comapring the monthly charges of churned customer with non-churned customers
     '''
     #identify the two groups
-    senior_churn_sample = train[(train['churn'] == 'Yes') & (train['senior_citizen'] == 1)].monthly_charges
-    senior_nonchurn_sample = train[(train['churn'] == 'No') & (train['senior_citizen'] == 1)].monthly_charges
+    churn_sample = train[(train['churn'] == 'Yes')].monthly_charges
+    nonchurn_sample = train[(train['churn'] == 'No')].monthly_charges
     
     #perform ttest, equal variances confirmed False
-    t, p = stats.ttest_ind(senior_churn_sample, senior_nonchurn_sample, equal_var=False)
+    t, p = stats.ttest_ind(churn_sample, nonchurn_sample, equal_var=False)
     
     # print the tstat and pvalue
     print(f't-stat = {t:.4f}')
@@ -146,47 +150,41 @@ def sen_churn_tstat(train):
     
 def get_bar_support(train):
     '''
-    return a bar chart visualizing the churn of senior customers
-    who have tech support vs seniors who do not
+    return a bar chart visualizing the churn of customers
+    who have tech support vs those who do not
     '''
     
-    # quantify churned seniors based on tech support 
-    has_support = len(train[(train['churn'] == 'Yes') & (
-        train['senior_citizen'] == 1) & (train['tech_support'] == 'Yes')])
+    # identify groups 
+    churned_has_support = len(train[(train['churn'] == 'Yes') & (train['tech_support'] == 'Yes')])
+    not_churned_has_support = len(train[(train['churn'] == 'No') & (train['tech_support'] == 'Yes')])
     
-    no_support = len(train[(train['churn'] == 'Yes') & (
-        train['senior_citizen'] == 1) & (train['tech_support'] == 'No')])
-    
-    no_support_no_internet = len(train[(train['churn'] == 'Yes') & (train['senior_citizen'] == 1) & (
-        train['tech_support'] == 'No internet service')])
+    churned_no_support = len(train[(train['churn'] == 'Yes')  & (train['tech_support'] == 'No')])
+    not_churned_no_support = len(train[(train['churn'] == 'No')  & (train['tech_support'] == 'No')])
     
     # set parameters
-    courses = ['Churned Seniors With Support',
-               'Churned Seniors Without Support', 
-               'Churned Seniors Without Support (no internet)']
-    values = [has_support, no_support, no_support_no_internet]
+    groups = ['Churned With Support', 'Retained With Support',
+                'Churned Without Support', 'Retained Without Support']
+   
+    values = [churned_has_support, not_churned_has_support,
+              churned_no_support, not_churned_no_support]
+    colors_list = ['red', 'lightgreen', 'red', 'lightgreen']
 
     fig = plt.figure(figsize = (12, 6))
 
     # creating the bar plot
-    plt.bar(courses, values, color ='silver',
-            width = .5, edgecolor = 'black')
+    plt.bar(groups, values, color =colors_list, edgecolor = 'black')
 
     # show plot
-    plt.ylabel("Count of Churned Seniors")
-    plt.title("Say Goodbye to Seniors Without Tech Support!")
+    plt.ylabel("Count of Customers")
+    plt.title("Say Goodbye to Customers Without Tech Support!")
     plt.show()
 
-def get_chi_techsupp_sen(train):
+def get_chi_techsupp(train):
     '''
-    get rusults of chi-square for churn and tech support among senior citizens 
-    '''
-    
-    # isolate the senior citizens
-    subset = train.loc[train['senior_citizen'] == 1]
-    
+    get rusults of chi-square for churn and tech support 
+    '''    
     # crosstab of columns to compare
-    observed = pd.crosstab(subset.tech_support, subset.churn)
+    observed = pd.crosstab(train.tech_support, train.churn)
     
     # perform chi2 test
     chi2, p, degf, expected = stats.chi2_contingency(observed)
@@ -194,6 +192,12 @@ def get_chi_techsupp_sen(train):
     #print results
     print(f'chi^2 = {chi2:.4f}')
     print(f'p     = {p:.8f}')
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:

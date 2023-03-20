@@ -38,6 +38,9 @@ def wrangle_telco_data():
         df['total_charges'] = df['total_charges'].str.replace(' ', '')
         df['total_charges'] = pd.to_numeric(df['total_charges'])
 
+        # only 11 missing values from 1 column. I will drop these rows
+        df = df.dropna()
+        
         # saving to csv
         df.to_csv('telco_churn_prepared.csv', index = False)
 
