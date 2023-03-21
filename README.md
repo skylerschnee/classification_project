@@ -1,81 +1,90 @@
 # Telco Churn
- 
+
 # Project Description
  
-Chess is widely renowned as one of the most skill intensive games ever invented. Both sides begin the game with identical pieces in an identical position, there are no random elements (aside from assigning the first move), and the movement of those pieces during a game can result in over 121 million possible combinations in just the fist three moves. Because of this, the player with the most skill is likely to win the grand majority of chess games. I have decided to look into the different elements of a chess game to determine if any of them increase or decrease the chance of a player with lower skill defeating a player with greater skill.
- 
+Customer retention is arguably the most important aspect of a long lasting, profitable business. Considering the massive proportion of gross profit business' spend on new customer aquisition, we can easily understand the value of retaining these customers. This begs the literal million dollar question- why have our customers left? And what actionable information can we draw from a scientific approach to analyzing our customer data? We will be exploring that in this project and attempt to build a machine learning model that accurately predicts churn.
+
 # Project Goal
  
-* Discover drivers of upsets in chess games played on Lichess.org
-* Use drivers to develop a machine learning model to classify games as ending in upset or not ending in upset
-* An upset is defined as a lower rated player defeating a higher rated player. 
-* This information could be used to further our understanding of which game elements contribute to or detract from a game’s skill intensity.
- 
+* Discover drivers of customer church at Telco.
+* Use drivers to develop a machine learning model that accurately predicts churn. 
+* This information could be used to further our understanding of which drivers have the most effect on churn.
+
 # Initial Thoughts
  
-My initial hypothesis is that drivers of upsets will be elements that either grant an outright advantage to one player or increase the likelihood of players making mistakes.
- 
+My initial hypothesis is that monthly chargesm senior citizen status, and access to tech support are the driving factors of churn.
+
 # The Plan
  
 * Aquire data from Code Up Database
  
 * Prepare data
    * Create Engineered columns from existing data
-       * upset
-       * rating_difference
-       * game_rating
-       * lower_rated_white
-       * time_control_group
- 
-* Explore data in search of drivers of upsets
-   * Answer the following initial questions
-       * How often do upsets occur?
-       * Does first move advantage affect upsets?
-       * Does a game being rated affect upsets?
-       * Does the average rating of both players have an effect on upsets?
-       * Does time block affect upsets?
-       * Does a player's choice of opening affect upsets?
+       * churn
+       * senior_citizen
+       * tech_support
+       * monthly_charges
       
-* Develop a Model to predict if a chess game will end in an upset
+* Explore data in search of drivers of churn
+   * Answer the following initial questions
+       * How often do senior citizens churn?
+       * Does tech support influence churn?
+       * Does the way customers pay influence churn?
+       * Does the monthly charges impact on churn?
+
+* Develop a Model to predict if a customer is likely to churn
    * Use drivers identified in explore to build predictive models of different types
    * Evaluate models on train and validate data
    * Select the best model based on highest accuracy
    * Evaluate the best model on test data
  
 * Draw conclusions
- 
+
 # Data Dictionary
 
 | Feature | Definition |
 |:--------|:-----------|
-|Rated| True or False, The game's result is reflected in each player's rating|
-|Winning Pieces| The color of pieces the winning player was moving|
-|White Rating| Rating of the player moving the white pieces using the Glicko-2 rating method for games played on Lichess|
-|Black Rating| Rating of the player moving the white pieces using the Glicko-2 rating method for games played on Lichess|
-|Rating Difference| The difference in rating between the players in the game|
-|Game Rating| The average rating of the two players in the game|
-|Lower Rated White| True or False, The lower rated player is moving the white pieces|
-|Opening Name| The name of the opening played in the game|
-|Time Control Group| The amount of time allotted to each player to make their moves, **Standard** (60 min or more), **Rapid** (30 - 15 min), **Blitz** (5 - 3 min), or **Bullet** (2 or less), **Other** (any other time limit)|
-|Upset (Target)| True or False, The lower rated player won the game|
-|Additional Features|Encoded and values for categorical data and scaled versions continuous data|
- 
+|Gender| The gender of the primary account holder|
+|Senior Citizen| True or False, is the primary account holder 62 years or age or older|
+|Partner| Yes or No, does the primary account holder have a partner in the household|
+|Dependants| Yes or No, does the primary account holder have at least 1 dependent in the household|
+|Tenure| The time in years the primary account holder has been a customer|
+|Phone Service| Yes or No, does the primary account holder have phone service with Telco|
+|Multiple Lines| Yes or No, does the primary account holder have multiple lines with Telco|
+|Internet Service Type ID|  **1** (DSL), **2** (Fiber Optic), **3** (None)
+|Tech Support| Yes or No, Has the client contacted tech support|
+|Contract Type ID|  **1** (Month-to-Month), **2** (One-Year), **3** (Two-Year)|
+|Payment Type ID| **1** (Electronic Check), **2** (Mailed Check), **3** (Automatic Bank Transfer), **4** (Credit Card)|
+|Monthly Charges| Monthly bill assesed to the cusotmer|
+|Total Charges| Total revenue paid by the cusotmer|
+|Churn| Yes or No, has the customer stopped doing business with us|
+
 # Steps to Reproduce
 1) Clone this repo.
-2) Acquire the data from [Kaggle](https://www.kaggle.com/datasnaek/chess)
+2) Acquire the data from [Kaggle](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
 3) Put the data in the file containing the cloned repo.
 4) Run notebook.
- 
+
 # Takeaways and Conclusions
-* Upsets occur in 1/3 of games
-* In games where the lower rated player moves first there is a 4% greater chance of an upset
-* Games that are rated have a 3% higher chance of an upset
-* Games with a "quick" time control (30 min or less) have about a 1 in 3 chance of upset
-* Games with a "slow" time control (60 min or more) have about a 1 in 5 chance of upset
-* The mean rating of players in a game is not a driver of upsets
-* The difference in player rating is a driver of upsets
-* A player's choice of opening is a driver of upsets, however its influence is complicated and I would need more time to discover what role it plays
- 
+- Approximately 27% of customers churn
+
+- Customers that pay more than the mean monthly charges are more likely to churn tthan those paying less than the mean
+
+- Senior Citizens are more likey to churn than customer who are not seniors
+
+- Customers with tech support are much less likely to churn than those without
+
+- Our KNN model performed well on train data, but appeared overfit once validated
+
+- Our best performing model was random forest, but did not beat the baseline. Likely reason:
+
+    - We know the features we chose are valuble, but we only used 3 to attempt to predict churn. 
+    
+- while our machine learning models did not prove to be very usefull as predictors of churn compared to the baseline accuracy, we certainly drew some actionable information from our exploration. I would urge stakeholders to approve further investigation into the probable causes senior citizen churn, as they are clearly over represented in the churned customer population
+
+- Secondly, I would recommend further analysis regarding tech support. Depending on the company's cost to provide customers with tech support, there may be significant value in providing the customers with this service at a much lower or even no cost, as it direclty influences customer retention. 
+
 # Recommendations
-* To increase the skill intensity of a game add to the length of time players are able to consider their moves
-* Based on the data longer time controls make it less likely for a less skilled player to beat a more skilled player
+- Regarding monthly charges, use multiple bins of charges instead of just above or below the mean of monthly charges.
+- Continue exploration to identify more features that influence churn
+- Include these features into our models 
